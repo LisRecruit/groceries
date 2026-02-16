@@ -1,0 +1,20 @@
+package com.example.groceries.auth.user;
+
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+    private final UserRepository userRepository;
+
+    public User getUserById (Long id){
+        return userRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("User not found"));
+    }
+
+    public User getUserByEmail (String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+    }
+}
