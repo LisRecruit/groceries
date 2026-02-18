@@ -2,13 +2,14 @@ package com.example.groceries.family;
 
 import com.example.groceries.auth.user.User;
 import com.example.groceries.auth.user.UserService;
-import com.example.groceries.family.dtos.requests.FamilyByCodeRequest;
 import com.example.groceries.family.dtos.responses.FamilyResponse;
 import com.example.groceries.family.dtos.responses.StringResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -20,29 +21,29 @@ public class FamilyService {
     private final UserService userService;
     private final FamilyMapper familyMapper;
 
-    public FamilyResponse getFamilyByCode(FamilyByCodeRequest request){
-        Family family = familyRepository.findByCode(request.code())
-                .orElseThrow(()->new EntityNotFoundException("Family not found"));
+    public FamilyResponse getFamilyByCode(int code){
+        Family family = familyRepository.findByCode(code)
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Family not found"));
         return familyMapper.familyToFamilyResponse(family);
     }
 
     @Transactional
     public StringResponse addUserToFamily(int familyCode, Long userId) {
         Family family = familyRepository.findByCode(familyCode)
-                .orElseThrow(()->new EntityNotFoundException("Family not found"));
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Family not found"));
         User user = userService.getUserById(userId);
         if (user.getFamily() != null) {
-            throw new IllegalStateException("User already belongs to a family");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User already belongs to a family");
         }
         family.addUser(user);
-        return new StringResponse("User add to family");
+        return new StringResponse("User added to family");
     }
 
     @Transactional
     public FamilyResponse createFamily (Long userId, String familyName) {
         User user = userService.getUserById(userId);
         if (user.getFamily() != null) {
-            throw new IllegalStateException("User already belongs to a family");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User already belongs to a family");
         }
         Family family = Family.builder()
                 .name(familyName)
@@ -58,17 +59,17 @@ public class FamilyService {
     public StringResponse removeFamilyMember (Long ownerId, Long userToRemoveId, Long familyId) {
         Family family = familyRepository.findById(familyId)
                 .orElseThrow(()-> new EntityNotFoundException("Family not found"));
-        User userToRemove = userService.getUserById(userToRemoveId);
         if (!ownerId.equals(family.getOwner().getId())) {
-            throw new IllegalStateException("Only owner can remove users");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only owner can remove users");
         }
 
+        User userToRemove = userService.getUserById(userToRemoveId);
         if (!family.getUsers().contains(userToRemove)) {
-            throw new IllegalStateException("User does not belong to this family");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not belongs to this family");
         }
 
         if (ownerId.equals(userToRemoveId)) {
-            throw new IllegalStateException("Owner cannot be removed");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Owner cannot be removed");
         }
 
         family.removeUser(userToRemove);

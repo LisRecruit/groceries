@@ -24,5 +24,5 @@ public class User {
     @JoinColumn(name = "family_id")
     private Family family;
     @OneToOne (mappedBy = "owner")
-    private Family owndFamily;
+    private Family ownedFamily;
 }
