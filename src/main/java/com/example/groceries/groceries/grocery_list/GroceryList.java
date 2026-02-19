@@ -1,7 +1,7 @@
 package com.example.groceries.groceries.grocery_list;
 
+import com.example.groceries.family.Family;
 import com.example.groceries.groceries.item_to_buy.Item;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,4 +22,16 @@ public class GroceryList {
     private Long id;
     @OneToMany(mappedBy = "groceryList", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items = new ArrayList<>();
+    @OneToOne
+    @JoinColumn (name = "family_id")
+    private Family family;
+    public void addItem(Item item) {
+        items.add(item);
+        item.setGroceryList(this);
+    }
+    public void removeItem(Item item) {
+        items.remove(item);
+        item.setGroceryList(null);
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.example.groceries.family;
 
 import com.example.groceries.auth.user.User;
+import com.example.groceries.groceries.grocery_list.GroceryList;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +28,9 @@ public class Family {
     @OneToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
-
+    @OneToOne
+    @JoinColumn(name = "grocery_list_id")
+    private GroceryList groceryList;
     public void addUser(User user) {
         users.add(user);
         user.setFamily(this);

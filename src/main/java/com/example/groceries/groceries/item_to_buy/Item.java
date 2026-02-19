@@ -26,6 +26,8 @@ public class Item {
     private String name;
     @Column(name = "quantity", nullable = false) //can be 0.5 for kg or liters
     private BigDecimal quantity;
+    @Column(name = "note")
+    private String note;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grocery_list_id", nullable = false)
     private GroceryList groceryList;
