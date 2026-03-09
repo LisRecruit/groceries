@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -55,6 +57,10 @@ public class JwtUtil {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("user_id", userId.toString());
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+        claims.put("roles", roles);
         return createToken(claims, userDetails.getUsername());
     }
     public Boolean validateToken(String token, UserDetails userDetails) {
@@ -100,5 +106,8 @@ public class JwtUtil {
 
         final Claims claims = getAllClaimsFromToken(token);
         return claims.get("user_id", Long.class); // Извлекаем userId
+    }
+    public List<String> extractRoles(String token) {
+        return extractClaim(token, claims -> claims.get("roles", List.class));
     }
 }

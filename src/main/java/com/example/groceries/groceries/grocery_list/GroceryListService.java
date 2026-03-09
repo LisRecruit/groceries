@@ -1,5 +1,7 @@
 package com.example.groceries.groceries.grocery_list;
 
+import com.example.groceries.family.Family;
+import com.example.groceries.family.FamilyRepository;
 import com.example.groceries.groceries.grocery_list.dtos.GroceryListResponse;
 import com.example.groceries.groceries.item_to_buy.Item;
 import com.example.groceries.groceries.item_to_buy.ItemRepository;
@@ -18,6 +20,7 @@ public class GroceryListService {
     private final GroceryListRepository groceryListRepository;
     private final ItemRepository itemRepository;
     private final GroceryListMapper groceryListMapper;
+    private final FamilyRepository familyRepository;
 
     public GroceryListResponse getGroceryListByFamily (Long familyId) {
         if (familyId==null){
@@ -71,4 +74,5 @@ public class GroceryListService {
         items.forEach(groceryList::removeItem);
         groceryListRepository.save(groceryList);
     }
+
 }

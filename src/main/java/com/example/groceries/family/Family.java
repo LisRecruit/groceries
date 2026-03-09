@@ -28,8 +28,8 @@ public class Family {
     @OneToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
-    @OneToOne
-    @JoinColumn(name = "grocery_list_id")
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, optional = false)
+    @JoinColumn(name = "grocery_list_id", nullable = false, unique = true)
     private GroceryList groceryList;
     public void addUser(User user) {
         users.add(user);
@@ -39,5 +39,9 @@ public class Family {
     public void removeUser(User user) {
         users.remove(user);
         user.setFamily(null);
+    }
+    public void setGroceryList(GroceryList groceryList) {
+        this.groceryList = groceryList;
+        groceryList.setFamily(this);
     }
 }

@@ -22,8 +22,7 @@ public class GroceryList {
     private Long id;
     @OneToMany(mappedBy = "groceryList", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items = new ArrayList<>();
-    @OneToOne
-    @JoinColumn (name = "family_id")
+    @OneToOne(mappedBy = "groceryList", optional = false)
     private Family family;
     public void addItem(Item item) {
         items.add(item);

@@ -4,6 +4,8 @@ import com.example.groceries.auth.user.User;
 import com.example.groceries.auth.user.UserService;
 import com.example.groceries.family.dtos.responses.FamilyResponse;
 import com.example.groceries.family.dtos.responses.StringResponse;
+import com.example.groceries.groceries.grocery_list.GroceryList;
+import com.example.groceries.groceries.grocery_list.GroceryListService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ public class FamilyService {
     private final FamilyRepository familyRepository;
     private final UserService userService;
     private final FamilyMapper familyMapper;
+    private final GroceryListService groceryListService;
 
     public FamilyResponse getFamilyByCode(int code){
         Family family = familyRepository.findByCode(code)
@@ -51,8 +54,12 @@ public class FamilyService {
                 .owner(user)
                 .build();
         family.addUser(user);
-        Family newFamily = familyRepository.save(family);
-        return familyMapper.familyToFamilyResponse(newFamily);
+        GroceryList groceryList = GroceryList.builder().build();
+        family.setGroceryList(groceryList);
+
+        Family savedFamily = familyRepository.save(family);
+
+        return familyMapper.familyToFamilyResponse(savedFamily);
     }
 
     @Transactional

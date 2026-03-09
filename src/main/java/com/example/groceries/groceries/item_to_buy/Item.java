@@ -32,13 +32,18 @@ public class Item {
     @JoinColumn(name = "grocery_list_id", nullable = false)
     private GroceryList groceryList;
     @ManyToMany(fetch = FetchType.LAZY)
-//    @Builder.Default
-//    @ToString.Exclude
-//    @EqualsAndHashCode.Exclude
-//    @JsonManagedReference
     @JoinTable(name = "items_stores",
             joinColumns = @JoinColumn(name = "item_id"),
             inverseJoinColumns = @JoinColumn(name = "store_id"))
     private List<Store> whereToBuy = new ArrayList<>();
+
+    public void addStore(Store store) {
+        whereToBuy.add(store);
+        store.getItems().add(this);
+    }
+    public void removeStore(Store store) {
+        whereToBuy.remove(store);
+        store.getItems().remove(store);
+    }
 
 }

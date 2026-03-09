@@ -1,8 +1,13 @@
 package com.example.groceries.auth.user;
 
+import com.example.groceries.auth.user.role.Role;
 import com.example.groceries.family.Family;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -25,4 +30,6 @@ public class User {
     private Family family;
     @OneToOne (mappedBy = "owner")
     private Family ownedFamily;
+    @JsonManagedReference
+    private List<Role> roles = new ArrayList<>();
 }
