@@ -18,7 +18,7 @@ import java.util.List;
 public class StoreService {
     private final StoreRepository storeRepository;
     private final StoreFamilyMetaRepository storeFamilyMetaRepository;
-
+    private final StoreMapper storeMapper;
 
     @Transactional
     public StoreResponse create (StoreCreateRequest request, Family family) {
@@ -91,7 +91,13 @@ public class StoreService {
     }
 
     //only for admins
-    public List<Store> getAllUnverifiedStores() {
-        return storeRepository.findAllByVerifiedFalse();
+    public List<StoreResponse> getAllUnverifiedStores() {
+        List <Store> stores = storeRepository.findAllByVerifiedFalse();
+        if (stores.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No unverified stores found");
+        }
+        return stores.stream()
+                .map(storeMapper::toResponse)
+                .toList();
     }
 }
